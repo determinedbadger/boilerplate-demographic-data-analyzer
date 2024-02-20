@@ -43,29 +43,33 @@ def calculate_demographic_data(print_data=True):
     race_count = df['race'].value_counts()
 
     # What is the average age of men?
-    condition = df[df['sex'] == 'Male']
-    sliced_df = df[condition]
-    average_age_men = sliced_df['age'].mean()
+    average_age_men = round(df[df['sex'] == 'Male']['age'].mean(), 1)   # get the average
 
     # What is the percentage of people who have a Bachelor's degree?
-    percentage_bachelors = None
+    percentage_bachelors = round(df['education'].value_counts()['Bachelors'] / df.shape[0] * 100,1)
 
     # What percentage of people with advanced education (`Bachelors`, `Masters`, or `Doctorate`) make more than 50K?
     # What percentage of people without advanced education make more than 50K?
-
     # with and without `Bachelors`, `Masters`, or `Doctorate`
     higher_education = None
     lower_education = None
 
     # percentage with salary >50K
-    higher_education_rich = None
-    lower_education_rich = None
-
+    edu_mask = (df['education'] == 'Bachelors') | (df['education'] == 'Masters') | (df['education'] == 'Doctorate') | (df['education'] == 'Masters')
+    sal_mask =  (df['salary'] == '>50K')
+    final_mask = edu_mask & sal_mask
+    higher_education_rich = round(df[final_mask].shape[0] / df[edu_mask].shape[0] * 100, 1)
+    
+    #Lower Education Rich
+    edu_mask = (df['education'] != 'Bachelors') & (df['education'] != 'Masters') & (df['education'] != 'Doctorate') & (df['education'] != 'Masters')
+    final_mask = edu_mask & sal_mask
+    lower_education_rich = round(df[final_mask].shape[0] / df[edu_mask].shape[0] * 100, 1)
+    
     # What is the minimum number of hours a person works per week (hours-per-week feature)?
-    min_work_hours = None
+    min_work_hours = df['hours-per-week'].min()
 
     # What percentage of the people who work the minimum number of hours per week have a salary of >50K?
-    num_min_workers = None
+    num_min_workers = df[(df['hours-per-week'] == df['hours-per-week'].min()) & (df['salary'] == '>50')].shape[0] / df.shape[0]
 
     rich_percentage = None
 
